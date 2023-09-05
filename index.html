@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ersemesterinformationen Geoinformatik</title>
+    <title>Erstsemesterinformationen Geoinformatik</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
@@ -299,23 +299,28 @@
                     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 }).addTo(map);
 
-                var geo1 = L.marker([51.96938773407033, 7.59597587193638]).addTo(map);
+                var geo1 = L.marker([51.96944051151324, 7.5957290640610395]).addTo(map);
                 geo1.bindPopup("GEO 1")
 
-                var matinf = L.marker([51.966118760688595, 7.603263948036556]).addTo(map);
+                var matinf = L.marker([51.96599169511269, 7.60312662394514]).addTo(map);
                 matinf.bindPopup("Mathe/Info Gebäude")
 
-                var mensa = L.marker([51.96529635124534, 7.600176560732151]).addTo(map);
+                var mensa = L.marker([51.9654430328652, 7.600197547068014]).addTo(map);
                 mensa.bindPopup("Mensa am Ring")
 
-                var bistro = L.marker([51.968668874521626, 7.594823134676698]).addTo(map);
+                var bistro = L.marker([51.968660543678055, 7.594688376344158]).addTo(map);
                 bistro.bindPopup("Bistro Denkpause")
 
-                var dom = L.marker([51.96263789577765, 7.624888760334262]).addTo(map);
+                var dom = L.marker([51.962481411192606, 7.625884957088404]).addTo(map);
                 dom.bindPopup("Domplatz")
 
-                var shooters = L.marker([51.96184371764317, 7.633627820250528]).addTo(map);
+                var shooters = L.marker([51.96182367686932, 7.6335694588558365]).addTo(map);
                 shooters.bindPopup("Shooters")
+
+                map.on('click', function(ev){
+                var latlng = map.mouseEventToLatLng(ev.originalEvent);
+                console.log(latlng.lat + ', ' + latlng.lng);
+                });
             </script>
         </div>
     </div>
