@@ -4,12 +4,55 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Ersemesterinformationen Geoinformatik</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
   <body>
-    <h1 class="text-center">Ersti-Info der Fachschaft Geoinformatik</h1>
-    <br>
+<header class="text-center">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
+        <div class="container-fluid">
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-mdb-toggle="collapse"
+            data-mdb-target="#navbarExample01"
+            aria-controls="navbarExample01"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarExample01">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item active">
+                <a class="nav-link" aria-current="page" href="#studium">Studium</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#owoche">Ersti-Woche</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#erstiwe">Ersti-Wochenende</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#kontakt">Kontakt</a>
+            </li>
+            </ul>
+        </div>
+        </div>
+    </nav>
+    <div class="p-5 text-center bg-light" style="margin-top: 58px;">
+        <div class="text-center p-4" style="background-color: rgba(63, 182, 50, 0.584);">
+            <h1 class="mb-3">Ersti-Infoseite</h1>
+            <h4 class="mb-3">der Fachschaft Geoinformatik Münster</h4>
+        </div>
+    </div>
+    </header>
+    <br><br>
     <div id="studium", class="container-fluid", style="width: 75%;">
         <h2 class="text-center">Informationen zum Studium</h2>
         <br>
@@ -238,14 +281,45 @@
             <b>Fachschaftsraum:</b> im EG des GEO 1, gegenüber des Hörsaals, Raum-Nr. 24
             323, 401, 513: Raumnummern der Seminarräume im GEO 1 im 3., 4. bzw. 5. Stock<br>
             <b>StudLab:</b> Computer-Räume auf der ersten Etage des GEO 1<br>
-            <b>FS Mathe/Info:</b> Raum der Fachschaft Mathe und Informatik, Raum 010, Einsteinstraße 62.
+            <b>FS Mathe/Info:</b> Raum der Fachschaft Mathe und Informatik, Raum 010, Adresse: Einsteinstraße 62.
             Dies ist der Treffpunkt für die geofs-Rallye. Wer den Weg nicht kennt, kann gerne vorher zur Fragestunde kommen und dann zusammen mit uns dorthin laufen. Um 12:45 gehen wir am Fachschaftsraum los.<br>
             <b>Mensa am Ring:</b> Große Mensa am Coesfelder Kreuz (wir gehen gemeinsam hin)<br>
             <b>Bistro Denkpause:</b> Kleinere Mensa direkt gegenüber des GEO 1 (auch dort gehen wir gemeinsam hin)
             (In welche Mensa wir gehen entscheidet sich ggf. spontan, vermutlich aber Bistro Denkpause)<br>
             <b>Domplatz:</b> Treffpunkt für die Kneipenrallye<br>
-            <b>Shooter Stars:</b> Gemeinsamer Kneipenabend<br>    
+            <b>Shooter Stars:</b> Gemeinsamer Kneipenabend<br><br>   
             <b>Hinweis:</b> Die Teilnahme an der Ersti-Woche ist nur für Studierende im ersten Semester möglich.
+        </div>
+        <br><br>
+        <div id="map" style="height: 500px;">
+            <script>
+                var map = L.map('map').setView([51.96, 7.62], 13);
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                }).addTo(map);
+
+                var geo1 = L.marker([51.969, 7.595]).addTo(map);
+                geo1.bindPopup("GEO 1")
+
+                var matinf = L.marker([51.965, 7.603]).addTo(map);
+                matinf.bindPopup("Mathe/Info Gebäude")
+
+                var mensa = L.marker([51.965, 7.599]).addTo(map);
+                mensa.bindPopup("Mensa am Ring")
+
+                var bistro = L.marker([51.968, 7.595]).addTo(map);
+                bistro.bindPopup("Bistro Denkpause")
+
+                var dom = L.marker([51.962, 7.625]).addTo(map);
+                dom.bindPopup("Domplatz")
+
+                var shooters = L.marker([51.961, 7.633]).addTo(map);
+                shooters.bindPopup("Shooters")
+
+                var shooters = L.marker([51.961, 7.633]).addTo(map);
+                shooters.bindPopup("Shooters")
+            </script>
         </div>
     </div>
     <br><br><br>
@@ -292,7 +366,7 @@
         </div>
     </div>
     <br><br><br>
-    <div id="Kontakt", class="container-fluid text-center", style="width: 75%;">
+    <div id="kontakt", class="container-fluid text-center", style="width: 75%;">
         <h2>Kontakt</h2>
         <br>
         <ul class="list-unstyled">
