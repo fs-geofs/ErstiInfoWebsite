@@ -1,433 +1,845 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="de">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Erstsemesterinformationen Geoinformatik</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fachschaft Geoinformatik</title>
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    />
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <style>
+      /* Grundlegendes Styling */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+      }
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+      /* Navigation Styling */
+      .navbar {
+        position: fixed;
+        top: 0; /* Anfangs ausgeblendet */
+        width: 100%; /* Stellt sicher, dass die Nav-Leiste die ganze Breite einnimmt */
+        background-color: #91c736;
+        display: flex;
+        justify-content: space-between; /* Logo links, Links rechts */
+        align-items: center;
+        height: 60px;
+        /*transition: top 0.3s ease-in-out; /* Smooth einblenden */
+        z-index: 10000;
+        left: 0;
+        padding: 0px 10px;
+      }
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-</head>
+      /* Logo Styling */
+      .navbar img {
+        height: 40px;
+      }
+
+      .navbar .nav-links {
+        color: white;
+        text-decoration: none;
+        margin-left: 15px;
+        font-size: 16px;
+        display: flex;
+        gap: 25px;
+        margin-right: 25px;
+      }
+
+      .navbar a {
+        color: white;
+        text-decoration: none;
+        text-align: center;
+        position: relative;
+      }
+
+      .navbar a::after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 2px;
+        background-color: white;
+        bottom: -5px;
+        left: 50%;
+        transition: width 0.3s ease, left 0.3s ease;
+      }
+
+      .navbar a:hover::after {
+        width: 100%;
+        left: 0;
+      }
+
+      /* Platzhalter für den Inhalt */
+      .content {
+        margin-top: 80px;
+        padding: 20px;
+      }
+
+      /* Hauptinhalt Styling */
+      .main-content {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 20px;
+        background-color: white;
+        display: flex;
+        gap: 40px;
+      }
+
+      .main-content h1 {
+        color: #91c736;
+        font-size: 2.5em;
+      }
+
+      .main-content p {
+        line-height: 1.6;
+        color: #333;
+      }
+
+      .left-column {
+        flex: 2;
+      }
+
+      .right-column {
+        flex: 1;
+        background-color: #333;
+        color: #91c736;
+        padding: 20px;
+        border-radius: 8px;
+      }
+
+      .right-column h2 {
+        font-size: 1.8em;
+        margin-bottom: 20px;
+      }
+
+      .right-column p {
+        margin: 10px 0;
+        color: white;
+      }
+
+      /* Footer */
+      footer {
+        background-color: #333;
+        color: white;
+        text-align: center;
+        padding: 20px;
+        margin-top: 40px;
+      }
+
+      /* Hauptinhalt Styling */
+      .main-content {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 20px;
+        background-color: white;
+        display: flex;
+        gap: 40px;
+        flex-wrap: wrap; /* Damit die Spalten umbrechen können */
+      }
+
+      /* Sicherstellen, dass die rechte Spalte unter der linken erscheint auf schmalen Bildschirmen */
+      @media (max-width: 768px) {
+        .main-content {
+          flex-direction: column; /* Richtet die Spalten untereinander aus */
+        }
+
+        .left-column,
+        .right-column {
+          flex: 1; /* Beide Spalten nehmen 100% der Breite ein */
+        }
+      }
+
+      .table-container {
+        max-width: 1000px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0);
+      }
+
+      .table-container h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+      }
+
+      table th,
+      table td {
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+      }
+
+      table thead {
+        background-color: #91c736;
+        color: white;
+      }
+
+      table tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      .logo {
+        filter: invert(1); /* Wandelt Logo von Schwarz zu Weiß um */
+      }
+    </style>
+  </head>
   <body>
-<header class="text-center">
-    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
-        <div class="container-fluid">
-            <i class="fas fa-bars"></i>
-        </button>
-        <div class="navbar-collapse" id="navbarExample">
-            <a class="navbar-brand" href="#">
-                <img src="https://raw.githubusercontent.com/fs-geofs/ErstiInfoWebsiteGI/main/gfx/geofs.png" alt="logo" style="width:40px;">
-            </a>
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item active">
-                    <a class="nav-link" aria-current="page" href="#fsgi">Fachschaft</a>
-                </li>
-            <li class="nav-item active">
-                <a class="nav-link" aria-current="page" href="#studium">Studium</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#owoche">Ersti-Woche</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#erstiwe">Ersti-Wochenende</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#kontakt">Kontakt</a>
-            </li>
-            </ul>
-        </div>
-        </div>
-    </nav>
-        <div class="text-center p-4" style="background-color: rgba(137, 190, 49); margin-top: 58px;">
-            <h1 class="mb-3">Ersti-Infoseite</h1>
-            <h4 class="mb-3">der Fachschaft Geoinformatik Münster</h4>
-        </div>
-    </header>
-    <br><br>
-
-    <div id="warning" class="text-center p-4" style="padding: 5px; border: 3px solid red; border-radius: 10px; width: fit-content; margin: auto;">
-            <h5>&#9888; Provisorische, temporäre Seite &#9888;</h5> <br>
-            Aufgrund von Serverproblemen ist unsere Webseite aktuell im WWW nicht erreichbar.<br>
-            Im Uni-Netzwerk bzw. per <a href="https://www.uni-muenster.de/IT/services/kommunikation/vpn/" target="_blank">VPN</a> könnt ihr sie unter <a href="https://geofs.uni-muenster.de" target="_blank">geofs.uni-muenster.de</a> aufrufen.
-    </div>
-    <br><br>
-    <div id="erstiheft", class="container-fluid text-center", style="width: 85%;">
-        <ul class="list-unstyled">
-            <li class="media">
-                <img href="https://qrco.de/bePChP" src="https://raw.githubusercontent.com/fs-geofs/ErstiInfoWebsiteGI/main/gfx/erstiheft_qr.jpeg" class="mx-auto d-block" alt="QR Code für das Erstiheft" style="width:240px;">
-                <div class="media-body">
-                Das Ersti-Heft per QR-Code oder folgendem Link erreichen: <a href="https://qrco.de/bePChP">https://qrco.de/bePChP</a>
-                </div>
-            </li>
-        </ul>
-    </div>   
-    <br><br>
-    <div id="fsgi", class="container-fluid", style="width: 85%;">
-        <h2 class="text-center">Die Fachschaft Geoinformatik</h2>
-        <br>
-        Seit dem Wintersemester 2001/02 hat der Studiengang eine eigene Fachschaft, die sich um die speziellen Fragen und Wünsche der Geoinformatikstudierenden kümmert. 
-        Eine Fachschaft ist eine aus Studierenden bestehende Vertretung, die sich voll und ganz dem Wohle ihrer Studierenden zu verschreiben hat. 
-        <br><br>
-        In der Fachschaft versuchen wir die Interessen der Studierenden gegenüber der Hochschule zu vertreten und Konflikte und Unklarheiten zu beseitigen. 
-        Also sind wir eine Anlaufstelle für Studierende und Dozenten gleichermaßen, die die Kommunikation unter den Studierenden und mit den Dozenten fördert, z.B. 
-        durch übergreifende Veranstaltungen. Die Fachschaft will die Interessen der Studierenden nach bestem Wissen und Gewissen kundtun, vertreten und verteidigen.
-        <br><br>    
-        Dies gilt natürlich auch für euch Studienanfänger*innen. Wir freuen uns immer über motivierte Neuzugänge die Lust haben das Studium aktiv mitzugestalten. 
-        Schaut gerne jeden Mittwoch um 18.00 Uhr bei uns im Fachschaftsraum und zur Sitzung vorbei. 
-        <br><br>
+    <!-- Navigation -->
+    <div class="navbar" id="navbar">
+      <!-- Logo auf der linken Seite -->
+      <a href="#"
+        ><img
+          src="https://raw.githubusercontent.com/fs-geofs/ErstiInfoWebsiteGI/main/gfx/geofs.png"
+          alt="Logo"
+          class="logo"
+      /></a>
+      <!-- Navigationslinks auf der rechten Seite -->
+      <div class="nav-links">
+        <a href="#fachschaft">Fachschaft</a>
+        <a href="#studium">Studium</a>
+        <a href="#Ersti-Woche">Ersti-Woche</a>
+        <a href="#Ersti-Wochenende">Ersti-Wochenende</a>
+      </div>
     </div>
 
-    <div id="studium", class="container-fluid", style="width: 85%;">
-        <h2 class="text-center">Informationen zum Studium</h2>
-        <br>
-        Als Fachschaft möchten wir euch bei eurem Einstieg in das Studentenleben begleiten. Dafür bieten wir euch eine <a href="#owoche">Ersti-Woche</a> (vor der ersten Vorlesungswoche) und ein <a href="#erstiwe">Ersti-Wochenende</a> an. Wir würden uns sehr freuen, viele von euch dort zu treffen :-).
-        <br><br>
-        Wir haben für euch eine Ersti-Info erstellt. Diese könnt ihr euch hier <a href="https://drive.google.com/file/d/1b1BuVB-r3lQDH4_DUcMjcNzAF82W9xJg/view?usp=sharing">herunterladen</a>.
-        <br><br>
-        <i>Beachtet auch die weiteren Hinweise unter dem Semesterplan: Es kommt noch mehr dazu!</i>
-        <br><br>
-        <h4 class="text-center">Semesterplan</h4>
-        <table class="table table-striped">
-            <thead>
-            <tr>
-                <th>Zeit</th>
-                <th>Montag</th>
-                <th>Dienstag</th>
-                <th>Mittwoch</th>
-                <th>Donnerstag</th>
-                <th>Freitag</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>8:00-10:00</td>
-                <td></td> <!-- Montag -->
-                <td></td> <!-- Dienstag -->
-                <td></td> <!-- Mittwoch -->
-                <td></td> <!-- Donnerstag -->
-                <td></td> <!-- Freitag -->
-            </tr>
-            <tr>
-                <td>10:00-12:00</td>
-                <td></td> <!-- Montag -->
-                <td><a href="https://studium.uni-muenster.de/qisserver/rds?state=verpublish&status=init&vmfile=no&moduleCall=webInfo&publishConfFile=webInfo&publishSubDir=veranstaltung&publishid=397453">Vorlesung Einführung in die Geoinformatik</a> / <a href="https://www.uni-muenster.de/LearnWeb/learnweb2/enrol/index.php?id=72223">Learnweb</a></td> <!-- Dienstag -->
-                <td></td> <!-- Mittwoch -->
-                <td></td> <!-- Donnerstag -->
-                <td></td> <!-- Freitag -->
-            </tr>
-            <tr>
-                <td>12:00-14:00</td>
-                <td><a href="https://studium.uni-muenster.de/qisserver/rds?state=verpublish&status=init&vmfile=no&moduleCall=webInfo&publishConfFile=webInfo&publishSubDir=veranstaltung&publishid=392045">Vorlesung Analysis für Informatiker</a> / <a href="https://www.uni-muenster.de/LearnWeb/learnweb2/enrol/index.php?id=71803">Learnweb</a></td> <!-- Montag -->
-                <td></td> <!-- Dienstag -->
-                <td><a href="https://studium.uni-muenster.de/qisserver/rds?state=verpublish&status=init&vmfile=no&publishid=397454&moduleCall=webInfo&publishConfFile=webInfo&publishSubDir=veranstaltung">Übung Einführung in die Geoinformatik</a></td> <!-- Mittwoch -->
-                <td><a href="https://studium.uni-muenster.de/qisserver/rds?state=verpublish&status=init&vmfile=no&moduleCall=webInfo&publishConfFile=webInfo&publishSubDir=veranstaltung&publishid=392045">Vorlesung Analysis für Informatiker</a> / <a href="https://www.uni-muenster.de/LearnWeb/learnweb2/enrol/index.php?id=71803">Learnweb</a></td> <!-- Donnerstag -->
-                <td></td> <!-- Freitag -->
-            </tr>
-            <tr>
-                <td>14:00-16:00</td>
-                <td><a href="https://studium.uni-muenster.de/qisserver/rds?state=verpublish&status=init&vmfile=no&moduleCall=webInfo&publishConfFile=webInfo&publishSubDir=veranstaltung&publishid=394086">Vorlesung Informatik 1</a> / <a href="https://www.uni-muenster.de/LearnWeb/learnweb2/enrol/index.php?id=72416">Learnweb</a></td> <!-- Montag -->
-                <td></td> <!-- Dienstag -->
-                <td><a>Mathe-Ergänzungskurs</a></td> <!-- Mittwoch -->
-                <td><a href="https://studium.uni-muenster.de/qisserver/rds?state=verpublish&status=init&vmfile=no&moduleCall=webInfo&publishConfFile=webInfo&publishSubDir=veranstaltung&publishid=394086">Vorlesung Informatik 1</a> / <a href="https://www.uni-muenster.de/LearnWeb/learnweb2/enrol/index.php?id=72416">Learnweb</a></td> <!-- Donnerstag -->
-                <td></td> <!-- Freitag -->
-            </tr>
-            <tr>
-                <td>16:00-18:00</td>
-                <td></td> <!-- Montag -->
-                <td></td> <!-- Dienstag -->
-                <td></td> <!-- Mittwoch -->
-                <td><a href="https://studium.uni-muenster.de/qisserver/rds?state=user&type=0">Einführung in Java</a> / <a href="https://www.uni-muenster.de/LearnWeb/learnweb2/">Learnweb</a></td> <!-- Donnerstag -->
-                <td></td> <!-- Freitag -->
-            </tr>
-            <tr>
-                <td>18:00-20:00</td>
-                <td><a href="https://studium.uni-muenster.de/qisserver/rds?state=user&type=0">GIS Grundkurs</a> / <a href="https://www.uni-muenster.de/LearnWeb/learnweb2/">Learnweb</a></td> <!-- Montag -->
-                <td></td> <!-- Dienstag -->
-                <td></td> <!-- Mittwoch -->
-                <td></td> <!-- Donnerstag -->
-                <td></td> <!-- Freitag -->
-            </tr>
-            </tbody>
-        </table>
-        <p>Den Stundenplan könnt ihr auch hier nochmal <a href="https://drive.google.com/file/d/1ScwYfyw1j3WXPW0FrkpsR9VhRHNQdqiA/view?usp=sharing">herunterladen.</a></p>
+    <!-- Hauptinhalt -->
+    <div class="main-content" id="fachschaft">
+      <!-- Linke Spalte -->
+      <div class="left-column">
+        <h1>Die Fachschaft Geoinformatik</h1>
+        <h2>Über uns</h2>
+        <p>
+          Seit dem Wintersemester 2001/02 hat der Studiengang eine eigene
+          Fachschaft, die sich um die speziellen Fragen und Wünsche der
+          Geoinformatikstudierenden kümmert. Eine Fachschaft ist eine aus
+          Studierenden bestehende Vertretung, die sich voll und ganz dem Wohle
+          ihrer Studierenden zu verschreiben hat.
+        </p>
+        <p>
+          In der Fachschaft versuchen wir die Interessen der Studierenden
+          gegenüber der Hochschule zu vertreten und Konflikte und Unklarheiten
+          zu beseitigen. Also sind wir eine Anlaufstelle für Studierende und
+          Dozenten gleichermaßen, die die Kommunikation unter den Studierenden
+          und mit den Dozenten fördert, z.B. durch übergreifende
+          Veranstaltungen. Die Fachschaft will die Interessen der Studierenden
+          nach bestem Wissen und Gewissen kundtun, vertreten und verteidigen.
+        </p>
+        <p>
+          Dies gilt natürlich auch für euch Studienanfänger*innen. Wir freuen
+          uns immer über motivierte Neuzugänge die Lust haben das Studium aktiv
+          mitzugestalten. Schaut gerne jeden Mittwoch um 18.00 Uhr bei uns im
+          Fachschaftsraum und zur Sitzung vorbei.
+        </p>
+      </div>
 
-        Zu den Mathe- und Informatik-Vorlesungen kommen noch <b>Übungstermine</b> hinzu. Für Mathe sind die möglichen Termine meist Montags, Dienstags und Mittwochs, für Info Donnerstags und Freitags . Die Organisation dazu, welchen Termin ihr bekommt, findet in der ersten Vorlesungswoche statt, also unbedingt zur ersten Vorlesung hingehen!
-        <br><br>
-        Bei der <b>Übung für EGI</b> (Einführung in die Geoinformatik) findet kein Tutorium statt wie bei Mathe und Info, sondern es ist mehr eine Fragestunde, die ihr wahrnehmen könnt wenn ihr möchtet – also nicht erschrecken, dass sie mit vier Stunden im Stundenplan steht.
-        <br><br>
-        Plant außerdem ein, dass in Mathe und Info <b>wöchentliche-</b> und in EGI alle <b>zwei Wochen Abgaben</b> zu machen sind, die einiges an Zeit beanspruchen.
-        <br><br>
-        Zudem gibt es voraussichtlich einen <b>Mathe-Ergänzungskurs</b>. Dieser ist quasi ein Nachhilfe-Kurs, der von unserem Institut extra angeboten wird, da Mathe im ersten Semester oft als der schwierigste Kurs wahrgenommen wird. Die Teilnahme ist also optional, aber höchstwahrscheinlich werdet ihr dort sehr gerne hingehen…
-        <br><br>
-        <b>Mehr Informationen zu den Veranstaltungen erhaltet ihr auch in der Ersti-Woche.</b>
-        Habt ihr auch vor dem Semester schon ein wenig Zeit und wollt eure Mathe-Kenntnisse auffrischen, könnt ihr einen Mathe-Vorkurs besuchen. In der Regel gibt es einen Vorkurs für Anwender (Wiederholung des Schulstoffes) und einen „richtigen“ Mathevorkurs (vom späteren Dozenten mit vorlesungsrelevanten Inhalten, also „Uni-Mathe“) . Ihr könnte selber entscheiden, ob und welchen Kurs ihr besuchen wollt. Hier findet ihr weitere Infos dazu.
-        <br><br>
-        <b>Weitere Hinweise:</b><br>
-        Nützliche Links, die euch gerade am Anfang des Studiums weiterhelfen: <br>
-        Habt ihr weitere Fragen? Dann schaut doch auch mal in unseren FAQ vorbei.<br>
-        Als Studierende an der Uni Münster seid ihr verpflichtet eure Uni-Emails regelmäßig abzurufen, da euch dort wichtige und offizielle Informationen erreichen. Das Postfach befindet sich <a href="https://permail.uni-muenster.de" target="_blank">hier</a>.<br>
-        Informationen zu Fristen und Terminen (zum Beispiel zu Semesterferien) an der Uni erhaltet ihr <a href="https://it-portal.uni-muenster.de/">hier</a>.
-    </div>
-    <br><br><br>
-
-    <div id="owoche", class="container-fluid", style="width: 85%;">
-        <h2 class="text-center">Informationen zur Ersti-Woche</h2>
-        <br>
-        Wir laden alle Geoinformatik-Erstsemesterstudierende sehr herzlich zu unserer Ersti-Woche ein! Diese findet immer in der Woche vor Vorlesungsbeginn statt, für das Wintersemester 2023/24 also vom 02.10.2023 – 06.10.2023.
-        Wir werden euch alles wichtige rund ums Studium erklären, damit ihr gelassen und locker ins Studium starten könnt. Keine Panik wegen Anmeldefristen & Co – wir erklären euch alles! Außerdem lernt ihr schon einmal eure Kommilitonen kennen, mit denen ihr bald gemeinsam studieren werdet. Und für reichlich Spaß wird natürlich auch gesorgt.
-        Solltet ihr in der Ersti-Woche keine Zeit haben, erklären wir euch alles wichtige auch gerne später, die Fristen sind lang genug! Wenn ihr es irgendwie einrichten könnt, legen wir euch die Teilnahme aber sehr ans Herz :-)
-        <br><br>
-        <div id="ablauf">
-            <h4 class="text-center">Ablauf</h4>
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th>Zeit</th>
-                    <th>Montag</th>
-                    <th>Dienstag</th>
-                    <th>Mittwoch</th>
-                    <th>Donnerstag</th>
-                    <th>Freitag</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>9:00</td>
-                    <td></td> <!-- Montag -->
-                    <td></td> <!-- Dienstag -->
-                    <td></td> <!-- Mittwoch -->
-                    <td></td> <!-- Donnerstag -->
-                    <td></td> <!-- Freitag -->
-                </tr>
-                <tr>
-                    <td>10:00</td>
-                    <td>Begrüßung (Hörsaal GEO 1)</td> <!-- Montag -->
-                    <td></td> <!-- Dienstag -->
-                    <td>Anmeldung ErstiWe (GEO 1)</td> <!-- Mittwoch -->
-                    <td></td> <!-- Donnerstag -->
-                    <td></td> <!-- Freitag -->
-                </tr>
-                <tr>
-                    <td>11:00</td>
-                    <td>Begrüßung (Hörsaal GEO 1)</td> <!-- Montag -->
-                    <td>Stadtexkursion<br>(Start an Überwasserkirche)</td> <!-- Dienstag -->
-                    <td>Geo-Brunch (Lichthof und Lernatelier GEO 1)</td> <!-- Mittwoch -->
-                    <td>GI-Fragestunde (Fachschaftsraum GI)</td> <!-- Donnerstag -->
-                    <td>Verabschiedung (Hörsaal GEO 1)</td> <!-- Freitag -->
-                </tr>
-                <tr>
-                    <td>12:00</td>
-                    <td></td> <!-- Montag -->
-                    <td>Rieselfelder Exkursion<br>(Start am GEO 1)</td> <!-- Dienstag -->
-                    <td></td> <!-- Mittwoch -->
-                    <td>Mittagessen (Mensa am Ring oder Bistro Denkpause)</td> <!-- Donnerstag -->
-                    <td>Vorstellung Organisationen (Hörsaal GEO 1)</td> <!-- Freitag -->
-                </tr>
-                <tr>
-                    <td>13:00</td>
-                    <td>Mittagessen (Mensa am Ring oder Bistro Denkpause)</td> <!-- Montag -->
-                    <td></td> <!-- Dienstag -->
-                    <td>Stadtrallye (Start am GEO 1)</td> <!-- Mittwoch -->
-                    <td>Geofs-Rally (Treffen am Mathegebäude)</td> <!-- Donnerstag -->
-                    <td>Vorstellung Organisationen (Hörsaal GEO 1)</td> <!-- Freitag -->
-                </tr>
-                <tr>
-                    <td>14:00</td>
-                    <td></td> <!-- Montag -->
-                    <td></td> <!-- Dienstag -->
-                    <td>Stadtrallye</td> <!-- Mittwoch -->
-                    <td></td> <!-- Donnerstag -->
-                    <td></td> <!-- Freitag -->
-                </tr>
-                <tr>
-                    <td>15:00</td>
-                    <td></td> <!-- Montag -->
-                    <td></td> <!-- Dienstag -->
-                    <td>Stadtrallye</td> <!-- Mittwoch -->
-                    <td></td> <!-- Donnerstag -->
-                    <td></td> <!-- Freitag -->
-                </tr>
-                <tr>
-                    <td>16:00</td>
-                    <td></td> <!-- Montag -->
-                    <td></td> <!-- Dienstag -->
-                    <td>Stadtrallye</td> <!-- Mittwoch -->
-                    <td></td> <!-- Donnerstag -->
-                    <td></td> <!-- Freitag -->
-                </tr>
-                <tr>
-                    <td>17:00</td>
-                    <td></td> <!-- Montag -->
-                    <td></td> <!-- Dienstag -->
-                    <td>Stadtrallye</td> <!-- Mittwoch -->
-                    <td></td> <!-- Donnerstag -->
-                    <td></td> <!-- Freitag -->
-                </tr>
-                <tr>
-                    <td>18:00</td>
-                    <td></td> <!-- Montag -->
-                    <td>Kneipenrallye (Start am Domplatz)</td> <!-- Dienstag -->
-                    <td></td> <!-- Mittwoch -->
-                    <td></td> <!-- Donnerstag -->
-                    <td></td> <!-- Freitag -->
-                </tr>
-                <tr>
-                    <td>19:00</td>
-                    <td>Spieleabend (GEO 1)</td> <!-- Montag -->
-                    <td>Kneipenrallye</td> <!-- Dienstag -->
-                    <td></td> <!-- Mittwoch -->
-                    <td></td> <!-- Donnerstag -->
-                    <td></td> <!-- Freitag -->
-                </tr>
-                <tr>
-                    <td>20:00</td>
-                    <td>Spieleabend (GEO 1)</td> <!-- Montag -->
-                    <td>Kneipenrallye</td> <!-- Dienstag -->
-                    <td></td> <!-- Mittwoch -->
-                    <td></td> <!-- Donnerstag -->
-                    <td>Gemeinsamer Kneipenabend (Treffpunkt im Shooters)</td> <!-- Freitag -->
-                </tr>
-                <tr>
-                    <td>21:00</td>
-                    <td>Spieleabend (GEO 1)</td> <!-- Montag -->
-                    <td>Kneipenrallye</td> <!-- Dienstag -->
-                    <td></td> <!-- Mittwoch -->
-                    <td></td> <!-- Donnerstag -->
-                    <td>Gemeinsamer Kneipenabend</td> <!-- Freitag -->
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        <br><br>
-        <div class="text-center">
-            <h4>Adressen und Locations</h4>
-            <br>
-            <b>GEO 1:</b> „Unser“ Gebäude, Adresse: Heisenbergstraße 2<br>
-            <b>HS/Hörsaal:</b> „Unser“ Hörsaal, im EG des GEO 1<br>
-            <b>Lernatelier:</b> im EG des GEO 1, Raum-Nr. 10<br>
-            <b>Fachschaftsraum:</b> im EG des GEO 1, gegenüber des Hörsaals, Raum-Nr. 24
-            323, 401, 513: Raumnummern der Seminarräume im GEO 1 im 3., 4. bzw. 5. Stock<br>
-            <b>StudLab:</b> Computer-Räume auf der ersten Etage des GEO 1<br>
-            <b>FS Mathe/Info:</b> Raum der Fachschaft Mathe und Informatik, Raum 010, Adresse: Einsteinstraße 62.
-            Dies ist der Treffpunkt für die geofs-Rallye. Wer den Weg nicht kennt, kann gerne vorher zur Fragestunde kommen und dann zusammen mit uns dorthin laufen. Um 12:45 gehen wir am Fachschaftsraum los.<br>
-            <b>Mensa am Ring:</b> Große Mensa am Coesfelder Kreuz (wir gehen gemeinsam hin)<br>
-            <b>Bistro Denkpause:</b> Kleinere Mensa direkt gegenüber des GEO 1 (auch dort gehen wir gemeinsam hin)
-            (In welche Mensa wir gehen entscheidet sich ggf. spontan, vermutlich aber Bistro Denkpause)<br>
-            <b>Domplatz:</b> Treffpunkt für die Kneipenrallye<br>
-            <b>Shooter Stars:</b> Gemeinsamer Kneipenabend<br><br>   
-            <b>Hinweis:</b> Die Teilnahme an der Ersti-Woche ist nur für Studierende im ersten Semester möglich.
-        </div>
-        <br><br>
-        <div id="map" style="height: 500px;">
-            <script>
-                var map = L.map('map').setView([51.96, 7.62], 13);
-                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                }).addTo(map);
-
-                var geo1 = L.marker([51.96944051151324, 7.5957290640610395]).addTo(map);
-                geo1.bindPopup("GEO 1")
-
-                var matinf = L.marker([51.96599169511269, 7.60312662394514]).addTo(map);
-                matinf.bindPopup("Mathe/Info Gebäude")
-
-                var mensa = L.marker([51.9654430328652, 7.600197547068014]).addTo(map);
-                mensa.bindPopup("Mensa am Ring")
-
-                var bistro = L.marker([51.968660543678055, 7.594688376344158]).addTo(map);
-                bistro.bindPopup("Bistro Denkpause")
-
-                var dom = L.marker([51.962481411192606, 7.625884957088404]).addTo(map);
-                dom.bindPopup("Domplatz")
-
-                var shooters = L.marker([51.96182367686932, 7.6335694588558365]).addTo(map);
-                shooters.bindPopup("Shooters")
-
-                map.on('click', function(ev){
-                var latlng = map.mouseEventToLatLng(ev.originalEvent);
-                console.log(latlng.lat + ', ' + latlng.lng);
-                });
-            </script>
-        </div>
-    </div>
-    <br><br><br>
-
-    <div id="erstiwe", class="container-fluid", style="width: 85%;">
-        <h2 class="text-center">Informationen zum Erstiwochenende</h2>
-        <br>
-        Besonders freuen wir uns auch auf unser jährliches Ersti-Wochenende. Wir fahren wieder in das Tagungshaus Drübberholz, um einander besser kennenzulernen und eine spaßige Zeit zu haben. Das Wochenende findet gemeinsam mit der Fachschaft Geographie-Landschaftsökologie statt.
-        <br><br>
-        <div class="text-center">
-            <b>Hinfahrt:</b> 10.11.2023 9:30 Uhr s.t. <br>
-            <b>Rückfahrt:</b> 12.11.2023 <br>
-            <b>Anmeldezeitraum:</b> online über <a href="https://geofs.uni-muenster.de/erstiwe">geofs.uni-muenster.de/erstiwe</a> (Anwesenheit in der Ersti-Woche erforderlich, URL aktuell nur aus Uninetz aufrufbar...) <br>
-            <b>Kostenbeitrag:</b> ca. 45 € <br>
-            <br>
-        </div>
-        <br><br>
-        <h4 class="text-center">Allgemeine Hinweise</h4>
-        Am Freitag fahren wir gemeinsam mit Bussen nach Drübberholz. Nehmt bitte für diesen Tag genügend Proviant mit, da es erst am Abend eine Mahlzeit gibt.
-        Der Kostenbeitrag wird für Fahrtkosten, Unterbringung in Mehrbettzimmern und Verpflegung verwendet und ist bei der Anmeldung bar zu zahlen (Geld bitte möglichst passend mitbringen).
-        Wir möchten darauf hinweisen, dass wir die Ersti-Fahrt in Ton und bewegtem Bild festhalten. Wer damit nicht einverstanden ist, muss aus organisatorischen Gründen im Voraus(!) Rücksprache mit der Fachschaft halten.
-        Wir freuen uns auch in diesem Jahr auf eine tolle Erstifahrt und hoffen mit Euch das Wochenende zu feiern!
-        <br>
-        <br><br>
-        <h4 class="text-center">Anmeldung & Abmeldung</h4>
-        Die Anmeldung für die Erstifahrt beginnt vor dem Geobrunch in der Erstiwoche. Die Plätze (vorraussichtlich 70) waren in den letzen Jahren sehr begehrt und meist schon während dem Geobrunch vergeben. Zur Anmeldung müssen der Personalausweis (Teilnahme leider erst ab 18 Jahren möglich) und der Kostenbeitrag in Bar mitgebracht werden.
-        Die Anmeldung ist verbindlich. Wenn eine angemeldete Person an der Fahrt nicht mehr teilnehmen will/kann, ist die Rückerstattung des Teilnehmerbetrages nur möglich, wenn ein Nachfolger gestellt wird (je nach Andrang auf der Warteliste). Mach in dem Fall bitte deinen Platz für andere frei, indem du dich hier abmeldest!
-        Falls du in der Erstiwoche nicht da bist, aber an der Fahrt teilnehmen willst, kannst du dich hier auf die Warteliste setzen lassen. Sobald sich jemand abmeldet, werden alle auf der Warteliste per Mail benachrichtigt und haben die Chance einen Platz zu bekommen (wer zuerst kommt, mahlt zuerst).
-        <br><br><br>
-        <h4 class="text-center">Packliste</h4>
-        <div class="text-center">
-        Ausreichend Proviant für Freitag Mittag und Nachmittag<br>
-        Einen sehr persönlichen Gegenstand!<br>
-        Musik: CDs, Gitarre oder andere Instrumente, Texte<br>
-        Hausschuhe (nicht brennbar!)<br>
-        Kleingeld (für Bier, Sprudel, Wasser)<br>
-        Snacks für zwischendurch<br>
-        Bettzeug oder Schlafsack & Bettlaken<br>
-        Regenkleidung (warm & trocken)<br>
-        Schreibzeug, Klemmbrett (wer hat),…<br>
-        Gute Laune!<br>
-        2 bis x Paar Schuhe (wer hat: Wanderschuhe)<br>
-        Handtücher
-        </div>
-    </div>
-    <br><br><br>
-
-    <div id="kontakt", class="container-fluid text-center", style="width: 85%;">
+      <!-- Rechte Spalte -->
+      <div class="right-column">
         <h2>Kontakt</h2>
-        <br>
-        <ul class="list-unstyled">
-            <li class="media">
-                <img class="mr-3" src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="whatsapp" style="width:64px;height:64px;">
-                <div class="media-body">
-                Ihr könnt uns gerne über WhatsApp schreiben. Ihr erreicht uns unter der Nummer 0251 8333947 oder unter <a href="https://wa.me/492518333947">https://wa.me/492518333947</a>
-                </div>
-            </li>
-            <li class="media my-4">
-                <img class="mr-3" src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="instagram logo" style="width:64px;height:64px;">
-                <div class="media-body">
-                Wir sind auch auf instagram unterwegs. Dort findet ihr uns unter <a href="https://www.instagram.com/fsgeoinformatikms/">@fsgeoinformatikms</a>
-                </div>
-            </li>
-            <li class="media">
-                <img class="mr-3" src="https://upload.wikimedia.org/wikipedia/commons/e/ee/%28at%29.svg" alt="email" style="width:64px;height:64px;">
-                <div class="media-body">
-                Wir sind natürlich auch per E-Mail für euch erreichbar. 
-                Unsere E-Mail Adresse lautet: <a href= "mailto:fsgi@uni-muenster.de">fsgi@uni-muenster.de</a>
-                </div>
-            </li>
-        </ul>
-    </div>
-    <footer class="text-center text-lg-start bg-light text-muted">
-        <div class="text-center p-4" style="background-color: rgba(137, 190, 49);">
-            © 2023 Fachschaft Geoinformatik
+        <div style="text-align: center">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+            alt="WhatsApp Logo"
+            style="
+              width: 70px;
+              height: 70px;
+              margin: 0 auto;
+              display: block;
+              margin-bottom: 10px;
+            "
+          />
+          <p style="font-size: 20px">
+            <strong>Whatsapp:</strong>
+            <a href="https://wa.me/492518333947" style="color: white"
+              >https://wa.me/492518333947</a
+            >
+          </p>
         </div>
-    </footer>
+        <div style="text-align: center">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg"
+            alt="Instagram Logo"
+            style="
+              width: 70px;
+              height: 70px;
+              margin: 0 auto;
+              display: block;
+              margin-bottom: 10px;
+            "
+          />
+          <p style="font-size: 20px">
+            <strong>Instagram:</strong>
+            <a
+              href="https://www.instagram.com/fsgeoinformatikms/"
+              style="color: white"
+              >@fsgeoinformatikms</a
+            >
+          </p>
+        </div>
+        <div style="text-align: center">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/7/76/%28at%29-white.svg"
+            alt="E-Mail Logo"
+            style="
+              width: 70px;
+              height: 70px;
+              margin: 0 auto;
+              display: block;
+              margin-bottom: 10px;
+            "
+          />
+          <p style="font-size: 20px">
+            <strong>E-Mail:</strong>
+            <a href="mailto:fsgi@uni-muenster.de" style="color: white"
+              >fsgi@uni-muenster.de</a
+            >
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content" id="studium">
+      <div class="left-column">
+        <h1>Informationen zum Studium</h1>
+        <p>
+          Als Fachschaft möchten wir euch bei eurem Einstieg in das
+          Studentenleben begleiten. Dafür bieten wir euch eine
+          <a href="#Ersti-Woche">Ersti-Woche</a> (vor der ersten Vorlesungswoche) und
+          ein <a href="#Ersti-Wochenende">Ersti-Wochenende</a> an. Wir würden uns sehr
+          freuen, viele von euch dort zu treffen :-). <br /><br />
+          Wir haben für euch eine Ersti-Info erstellt. Diese könnt ihr euch hier
+          <a
+            href=""
+            >herunterladen</a
+          >. <br /><br />
+          <i
+            >Beachtet auch die weiteren Hinweise unter dem Semesterplan: Es
+            kommt noch mehr dazu!</i
+          >
+          <br /><br />
+          Den Stundenplan könnt ihr auch hier nochmal
+          <a
+            href=""
+            >herunterladen.</a
+          >
+        </p>
+      </div>
+    </div>
+
+      <div class="main-content" id="studium">
+        <div class="left-column">
+          <div class="table-container">
+            <h2>Semesterplan</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Zeit</th>
+                  <th>Montag</th>
+                  <th>Dienstag</th>
+                  <th>Mittwoch</th>
+                  <th>Donnerstag</th>
+                  <th>Freitag</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>8:00-10:00</td>
+                  <td></td>
+                  <!-- Montag -->
+                  <td></td>
+                  <!-- Dienstag -->
+                  <td></td>
+                  <!-- Mittwoch -->
+                  <td></td>
+                  <!-- Donnerstag -->
+                  <td></td>
+                  <!-- Freitag -->
+                </tr>
+                <tr>
+                  <td>10:00-12:00</td>
+                  <td></td>
+                  <!-- Montag -->
+                  <td>
+                    <a
+                      href="https://studium.uni-muenster.de/qisserver/rds?state=verpublish&status=init&vmfile=no&publishid=423124&moduleCall=webInfo&publishConfFile=webInfo&publishSubDir=veranstaltung"
+                      >Vorlesung Einführung in die Geoinformatik</a
+                    >
+                    /
+                    <a
+                      href="https://sso.uni-muenster.de/LearnWeb/learnweb2/course/view.php?id=80062"
+                      >Learnweb</a
+                    >
+                  </td>
+                  <!-- Dienstag -->
+                  <td></td>
+                  <!-- Mittwoch -->
+                  <td></td>
+                  <!-- Donnerstag -->
+                  <td></td>
+                  <!-- Freitag -->
+                </tr>
+                <tr>
+                  <td>12:00-14:00</td>
+                  <td>
+                    <a
+                      href="https://studium.uni-muenster.de/qisserver/rds?state=verpublish&status=init&vmfile=no&publishid=418177&moduleCall=webInfo&publishConfFile=webInfo&publishSubDir=veranstaltung"
+                      >Vorlesung Analysis für Informatiker</a
+                    >
+                    /
+                    <a
+                      href="https://sso.uni-muenster.de/LearnWeb/learnweb2/enrol/index.php?id=79885"
+                      >Learnweb</a
+                    >
+                  </td>
+                  <!-- Montag -->
+                  <td></td>
+                  <!-- Dienstag -->
+                  <td>
+                    <a
+                      href="https://studium.uni-muenster.de/qisserver/rds?state=verpublish&status=init&vmfile=no&publishid=423125&moduleCall=webInfo&publishConfFile=webInfo&publishSubDir=veranstaltung"
+                      >Übung Einführung in die Geoinformatik</a
+                    >
+                  </td>
+                  <!-- Mittwoch -->
+                  <td>
+                    <a
+                      href="https://studium.uni-muenster.de/qisserver/rds?state=verpublish&status=init&vmfile=no&publishid=418177&moduleCall=webInfo&publishConfFile=webInfo&publishSubDir=veranstaltung"
+                      >Vorlesung Analysis für Informatiker</a
+                    >
+                    /
+                    <a
+                      href="https://sso.uni-muenster.de/LearnWeb/learnweb2/enrol/index.php?id=79885"
+                      >Learnweb</a
+                    >
+                  </td>
+                  <!-- Donnerstag -->
+                  <td></td>
+                  <!-- Freitag -->
+                </tr>
+                <tr>
+                  <td>14:00-16:00</td>
+                  <td>
+                    <a href="">Vorlesung Informatik 1</a>
+                    /
+                    <a href="">Learnweb</a>
+                  </td>
+                  <!-- Montag -->
+                  <td></td>
+                  <!-- Dienstag -->
+                  <td>
+                    <a>Mathe-Ergänzungskurs (ab zweiter Vorlesungswoche)</a>
+                  </td>
+                  <!-- Mittwoch -->
+                  <td>
+                    <a href="">Vorlesung Informatik 1</a>
+                    /
+                    <a href="">Learnweb</a>
+                  </td>
+                  <!-- Donnerstag -->
+                  <td></td>
+                  <!-- Freitag -->
+                </tr>
+                <tr>
+                  <td>16:00-18:00</td>
+                  <td></td>
+                  <!-- Montag -->
+                  <td></td>
+                  <!-- Dienstag -->
+                  <td></td>
+                  <!-- Mittwoch -->
+                  <td>
+                    <a
+                      href="https://studium.uni-muenster.de/qisserver/rds?state=user&type=0"
+                      >Einführung in Java (ab Mitte der Vorlesungszeit)</a
+                    >
+                    /
+                    <a href="https://www.uni-muenster.de/LearnWeb/learnweb2/"
+                      >Learnweb</a
+                    >
+                  </td>
+                  <!-- Donnerstag -->
+                  <td></td>
+                  <!-- Freitag -->
+                </tr>
+                <tr>
+                  <td>18:00-20:00</td>
+                  <td>
+                    <a href="">GIS Grundkurs</a>
+                    /
+                    <a href="">Learnweb</a>
+                  </td>
+                  <!-- Montag -->
+                  <td></td>
+                  <!-- Dienstag -->
+                  <td></td>
+                  <!-- Mittwoch -->
+                  <td></td>
+                  <!-- Donnerstag -->
+                  <td></td>
+                  <!-- Freitag -->
+                </tr>
+              </tbody>
+            </table>
+  
+        </div>
+      </div>
+    </div>
+    <div class="main-content">
+        <div class="left-column">
+          <p>
+            Zu den Mathe- und Informatik-Vorlesungen kommen noch
+            <b>Übungstermine</b> hinzu. Für Mathe sind die möglichen Termine
+            meist Montags, Dienstags und Mittwochs, für Info Donnerstags und
+            Freitags. Die Organisation dazu, welchen Termin ihr bekommt, findet
+            in der ersten Vorlesungswoche statt, also unbedingt zur ersten
+            Vorlesung hingehen! <br /><br />
+            Bei der <b>Übung für EGI</b> (Einführung in die Geoinformatik)
+            findet kein Tutorium statt wie bei Mathe und Info, sondern es ist
+            mehr eine Fragestunde, die ihr wahrnehmen könnt wenn ihr möchtet –
+            also nicht erschrecken, dass sie mit vier Stunden im Stundenplan
+            steht. <br /><br />
+            Plant außerdem ein, dass in Mathe und Info <b>wöchentliche-</b> und
+            in EGI alle <b>zwei Wochen Abgaben</b> zu machen sind, die einiges
+            an Zeit beanspruchen. <br /><br />
+            Zudem gibt es voraussichtlich einen <b>Mathe-Ergänzungskurs</b>.
+            Dieser ist quasi ein Nachhilfe-Kurs, der von unserem Institut extra
+            angeboten wird, da Mathe im ersten Semester oft als der schwierigste
+            Kurs wahrgenommen wird. Die Teilnahme ist also optional, aber
+            höchstwahrscheinlich werdet ihr dort sehr gerne hingehen…
+            <br /><br />
+            <b
+              >Mehr Informationen zu den Veranstaltungen erhaltet ihr auch in
+              der Ersti-Woche.</b
+            >
+            Habt ihr auch vor dem Semester schon ein wenig Zeit und wollt eure
+            Mathe-Kenntnisse auffrischen, könnt ihr einen Mathe-Vorkurs
+            besuchen. In der Regel gibt es einen Vorkurs für Anwender
+            (Wiederholung des Schulstoffes) und einen „richtigen“ Mathevorkurs
+            (vom späteren Dozenten mit vorlesungsrelevanten Inhalten, also
+            „Uni-Mathe“) . Ihr könnte selber entscheiden, ob und welchen Kurs
+            ihr besuchen wollt. Hier findet ihr weitere Infos dazu.
+            <br /><br />
+            <b>Weitere Hinweise:</b><br />
+            Nützliche Links, die euch gerade am Anfang des Studiums
+            weiterhelfen:
+            <br />
+            Habt ihr weitere Fragen? Dann schaut doch auch mal in unseren FAQ
+            vorbei.<br />
+            Als Studierende an der Uni Münster seid ihr verpflichtet eure
+            Uni-Emails regelmäßig abzurufen, da euch dort wichtige und
+            offizielle Informationen erreichen. Das Postfach befindet sich
+            <a href="https://permail.uni-muenster.de" target="_blank">hier</a
+            >.<br />
+            Informationen zu Fristen und Terminen (zum Beispiel zu
+            Semesterferien) an der Uni erhaltet ihr
+            <a href="https://it-portal.uni-muenster.de/">hier</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+    
+
+    <div class="main-content" id="Ersti-Woche">
+      <div class="left-column">
+        <h1>Informationen zur Ersti-Woche</h1>
+        <p>
+          Wir laden alle Geoinformatik-Erstsemesterstudierende sehr herzlich zu
+          unserer Ersti-Woche ein! Diese findet immer in der Woche vor
+          Vorlesungsbeginn statt, für das Wintersemester 2024/25 also vom
+          31.9.2024 – 04.10.2024.
+        </p>
+        <p>
+          Wir werden euch alles wichtige rund ums Studium erklären, damit ihr
+          gelassen und locker ins Studium starten könnt. Keine Panik wegen
+          Anmeldefristen & Co – wir erklären euch alles! Außerdem lernt ihr
+          schon einmal eure Kommilitonen kennen, mit denen ihr bald gemeinsam
+          studieren werdet. Und für reichlich Spaß wird natürlich auch gesorgt.
+          Solltet ihr in der Ersti-Woche keine Zeit haben, erklären wir euch
+          alles wichtige auch gerne später, die Fristen sind lang genug! Wenn
+          ihr es irgendwie einrichten könnt, legen wir euch die Teilnahme aber
+          sehr ans Herz :-)
+        </p>
+
+        <h2>Adressen und Location</h2>
+        <p>
+          <br />
+          <b>GEO 1:</b> „Unser“ Gebäude, Adresse: Heisenbergstraße 2<br />
+          <b>HS/Hörsaal:</b> „Unser“ Hörsaal, im EG des GEO 1<br />
+          <b>Lernatelier:</b> im EG des GEO 1, Raum-Nr. 10<br />
+          <b>Fachschaftsraum:</b> im EG des GEO 1, gegenüber des Hörsaals,
+          Raum-Nr. 24<br />
+          <b>323, 401, 513:</b> Raumnummern der Seminarräume im GEO 1 im 3., 4.
+          bzw. 5. Stock<br />
+          <b>StudLab:</b> Computer-Räume auf der ersten Etage des GEO 1<br />
+          <b>FS Mathe/Info:</b> Raum der Fachschaft Mathe und Informatik, Raum
+          010, Adresse: Einsteinstraße 62. Dies ist der Treffpunkt für die
+          geofs-Rallye. Wer den Weg nicht kennt, kann gerne vorher zur
+          Fragestunde kommen und dann zusammen mit uns dorthin laufen. Um 12:45
+          gehen wir am Fachschaftsraum los.<br />
+          <b>Mensa am Ring:</b> Große Mensa am Coesfelder Kreuz (wir gehen
+          gemeinsam hin)<br />
+          <b>Bistro Denkpause:</b> Kleinere Mensa direkt gegenüber des GEO 1
+          (auch dort gehen wir gemeinsam hin) (In welche Mensa wir gehen
+          entscheidet sich ggf. spontan, vermutlich aber Bistro Denkpause)<br />
+          <b>Domplatz:</b> Treffpunkt für die Kneipenrallye<br />
+          <b>Shooter Stars:</b> Gemeinsamer Kneipenabend<br /><br />
+          <b>Hinweis:</b> Die Teilnahme an der Ersti-Woche ist nur für
+          Studierende im ersten Semester möglich.
+        </p>
+        <div id="map" style="height: 400px; width: 100%"></div>
+      </div>
+    </div>
+
+
+    
+    <div class="main-content">
+        <div class="left-column">
+    <div class="table-container">
+      <h2>Ablauf</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Zeit</th>
+            <th>Montag</th>
+            <th>Dienstag</th>
+            <th>Mittwoch</th>
+            <th>Donnerstag</th>
+            <th>Freitag</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>9:00</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>10:00</td>
+            <td>Begrüßung (Hörsaal GEO 1)</td>
+            <td>Geo-Brunch 10:30 Uhr (Lichthof und Lernatelier GEO 1)</td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>11:00</td>
+            <td>Begrüßung (Hörsaal GEO 1)</td>
+            <td>Stadtrallye 11:30 Uhr (Start am GEO 1)</td>
+            <td>GI-Fragestunde (Fachschaftsraum GI)</td>
+            <td></td>
+            <td>Anmeldung ErstiWe (GEO 1)</td>
+          </tr>
+          <tr>
+            <td>12:00</td>
+            <td></td>
+            <td>Stadtrallye</td>
+            <td>Mittagessen (Mensa am Ring oder Bistro Denkpause)</td>
+            <td>Stadtexkursion (Start an Überwasserkirche)</td>
+            <td>Verabschiedung (Hörsaal GEO 1)</td>
+          </tr>
+          <tr>
+            <td>13:00</td>
+            <td>Mittagessen (Mensa am Ring oder Bistro Denkpause)</td>
+            <td>Stadtrallye</td>
+            <td>Geofs-Rally (Start am Mathe/Info Gebäude)</td>
+            <td>Exkursion</td>
+            <td>Vorstellung Organisationen (Hörsaal GEO 1)</td>
+          </tr>
+          <tr>
+            <td>14:00</td>
+            <td>Einführung ins Studium (Lernatelier)</td>
+            <td>Stadtrallye</td>
+            <td></td>
+            <td>Exkursion</td>
+            <td>Vorstellung Organisationen (Hörsaal GEO 1)</td>
+          </tr>
+          <tr>
+            <td>15:00</td>
+            <td></td>
+            <td>Stadtrallye</td>
+            <td></td>
+            <td>Exkursion</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>16:00</td>
+            <td></td>
+            <td>Stadtrallye</td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>17:00</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>18:00</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>19:00</td>
+            <td>Spieleabend (GEO 1)</td>
+            <td>(Kneipenabend mit Geowissenschaften)</td>
+            <td>Filmabend (GEO 1)</td>
+            <td>Kneipenrallye (Start am Domplatz)</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>20:00</td>
+            <td>Spieleabend (GEO 1)</td>
+            <td></td>
+            <td>Filmabend (GEO 1)</td>
+            <td>Kneipenrallye</td>
+            <td>Gemeinsamer Kneipenabend (Treffpunkt im Shooters)</td>
+          </tr>
+          <tr>
+            <td>21:00</td>
+            <td>Spieleabend (GEO 1)</td>
+            <td></td>
+            <td>Filmabend (GEO 1)</td>
+            <td>Kneipenrallye</td>
+            <td>Gemeinsamer Kneipenabend</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+    </div>
+
+
+    <div class="main-content" id="Ersti-Wochenende">
+      <div class="left-column">
+        <h1>Informationen zum Erstiwochenende</h1>
+        <p>
+          Besonders freuen wir uns auch auf unser jährliches Ersti-Wochenende.
+          Wir fahren wieder in das Tagungshaus Drübberholz, um einander besser
+          kennenzulernen und eine spaßige Zeit zu haben. Das Wochenende findet
+          gemeinsam mit der Fachschaft Geographie-Landschaftsökologie statt.
+        </p>
+        <div class="right-column">
+          <p>
+            <b>Hinfahrt:</b> 25.10.2024 9:30 Uhr s.t. <br />
+            <b>Rückfahrt:</b> 27.10.2024 <br />
+            <b>Anmeldezeitraum:</b> online über
+            <a
+              href="https://???.uni-muenster.de/???"
+              style="color: white"
+              >https://???.uni-muenster.de/???</a
+            >
+            (Anwesenheit in der Ersti-Woche erforderlich) <br />
+            <b>Kostenbeitrag:</b> ca. 50 € <br />
+          </p>
+        </div>
+        <h3>Allgemeine Hinweise</h3>
+        <p>
+          Am Freitag fahren wir gemeinsam mit Bussen nach Drübberholz. Nehmt
+          bitte für diesen Tag genügend Proviant mit, da es erst am Abend eine
+          Mahlzeit gibt. Der Kostenbeitrag wird für Fahrtkosten, Unterbringung
+          in Mehrbettzimmern und Verpflegung verwendet und ist bei der Anmeldung
+          bar zu zahlen (Geld bitte möglichst passend mitbringen). Wir möchten
+          darauf hinweisen, dass wir die Ersti-Fahrt in Ton und bewegtem Bild
+          festhalten. Wer damit nicht einverstanden ist, muss aus
+          organisatorischen Gründen im Voraus(!) Rücksprache mit der Fachschaft
+          halten. Wir freuen uns auch in diesem Jahr auf eine tolle Erstifahrt
+          und hoffen mit Euch das Wochenende zu feiern!
+        </p>
+
+        <h3>Anmeldung & Abmeldung</h3>
+        <p>
+          Die Anmeldung für die Erstifahrt beginnt vor dem Geobrunch in der
+          Erstiwoche. Die Plätze (vorraussichtlich 70) waren in den letzen
+          Jahren sehr begehrt und meist schon während dem Geobrunch vergeben.
+          Zur Anmeldung müssen der Personalausweis (Teilnahme leider erst ab 18
+          Jahren möglich) und der Kostenbeitrag in Bar mitgebracht werden. Die
+          Anmeldung ist verbindlich. Wenn eine angemeldete Person an der Fahrt
+          nicht mehr teilnehmen will/kann, ist die Rückerstattung des
+          Teilnehmerbetrages nur möglich, wenn ein Nachfolger gestellt wird (je
+          nach Andrang auf der Warteliste). Mach in dem Fall bitte deinen Platz
+          für andere frei, indem du dich hier abmeldest! Falls du in der
+          Erstiwoche nicht da bist, aber an der Fahrt teilnehmen willst, kannst
+          du dich hier auf die Warteliste setzen lassen. Sobald sich jemand
+          abmeldet, werden alle auf der Warteliste per Mail benachrichtigt und
+          haben die Chance einen Platz zu bekommen (wer zuerst kommt, mahlt
+          zuerst).
+        </p>
+
+        <h3>Packliste</h3>
+        <p>
+          Ausreichend Proviant für Freitag Mittag und Nachmittag<br />
+          Einen sehr persönlichen Gegenstand!<br />
+          Musik: CDs, Gitarre oder andere Instrumente, Texte<br />
+          Hausschuhe (nicht brennbar!)<br />
+          Kleingeld (für Bier, Sprudel, Wasser)<br />
+          Snacks für zwischendurch<br />
+          Bettzeug oder Schlafsack & Bettlaken<br />
+          Regenkleidung (warm & trocken)<br />
+          Schreibzeug, Klemmbrett (wer hat),…<br />
+          Gute Laune!<br />
+          2 bis x Paar Schuhe (wer hat: Wanderschuhe)<br />
+          Handtücher
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>© 2024 Fachschaft Geoinformatik</footer>
+
+    <script>
+      // Funktion zum Überwachen des Scrollens
+
+      var map = L.map("map").setView([51.9625, 7.625], 13); // Position auf Münster zentriert
+
+      // Leaflet Tile Layer (OpenStreetMap)
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map);
+
+      // Beispiel-Marker hinzufügen
+      var geo1 = L.marker([51.96944051151324, 7.5957290640610395]).addTo(map);
+      geo1.bindPopup("GEO 1");
+
+      var matinf = L.marker([51.96599169511269, 7.60312662394514]).addTo(map);
+      matinf.bindPopup("Mathe/Info Gebäude");
+
+      var mensa = L.marker([51.9654430328652, 7.600197547068014]).addTo(map);
+      mensa.bindPopup("Mensa am Ring");
+
+      var bistro = L.marker([51.968660543678055, 7.594688376344158]).addTo(map);
+      bistro.bindPopup("Bistro Denkpause");
+
+      var dom = L.marker([51.962481411192606, 7.625884957088404]).addTo(map);
+      dom.bindPopup("Domplatz");
+
+      var shooters = L.marker([51.96182367686932, 7.6335694588558365]).addTo(
+        map
+      );
+      shooters.bindPopup("Shooters");
+    </script>
   </body>
 </html>
